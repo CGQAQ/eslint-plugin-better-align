@@ -1,0 +1,14 @@
+{
+  "name": "examples",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "lint": "eslint --ext .js,.ts .",
+    "lint:fix": "eslint --ext .js,.ts . --fix"
+  },
+  "devDependencies": {
+    "eslint": "^8.13.0",
+    "eslint-plugin-better-align": "file:../"
+  }
+}
