@@ -1,8 +1,9 @@
 {
   "name": "examples",
+  "private": true,
   "version": "1.0.0",
   "main": "index.js",
-  "license": "MIT",
+  "license": "MPL-2.0",
   "scripts": {
     "lint": "eslint --ext .js,.ts .",
     "lint:fix": "eslint --ext .js,.ts . --fix"
