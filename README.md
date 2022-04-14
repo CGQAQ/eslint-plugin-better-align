@@ -1,7 +1,6 @@
 # eslint-plugin-better-align
 
 ## eslint-plugin-better-align/import-align
-> 
 Before
 ```js
 import a from "a";
@@ -16,11 +15,11 @@ import ccc from "c";
 ```
 
 ### Usage:
-> run
+1. Install the plugin
 ```bash
 yarn add -D eslint-plugin-better-align
 ```
-and in your eslint config file
+2. In your eslint config file, adding:
 ```js
 ...
 "plugins": [
