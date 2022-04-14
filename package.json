@@ -1,0 +1,11 @@
+{
+  "name": "eslint-plugin-better-align",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:CGQAQ/eslint-rule-import-align.git",
+  "author": "CGQAQ <m.jason.liu@outlook.com>",
+  "license": "MPL-2.0",
+  "devDependencies": {
+    "eslint": "^8.13.0"
+  }
+}
