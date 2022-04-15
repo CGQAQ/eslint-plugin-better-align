@@ -1,7 +1,7 @@
 "use strict";
 
-const FROM_REG = /\s*from\s*?"/;
-const FROM_END_REG = /from\s*?"/;
+const FROM_REG = /\s*from\s*?["']/;
+const FROM_END_REG = /from\s*?["']/;
 
 /**
  * 
