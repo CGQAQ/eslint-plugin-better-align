@@ -6,12 +6,24 @@ Before
 import a from "a";
 import bb from "b";
 import ccc from "c";
+import    "d";
+import {
+    xxx,
+    yyy,
+    zzz,
+}    from "e";
 ```
 After
 ```js
 import a   from "a";
 import bb  from "b";
 import ccc from "c";
+import "d"; // Redundent spacing in from side effect import statement are stripped for now.
+import {
+    xxx,
+    yyy,
+    zzz,
+}    from "e";  // Multiline import statement are ignored for now.
 ```
 
 ### Usage:

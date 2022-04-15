@@ -3,6 +3,10 @@
 const FROM_REG = /\s*from\s*?["']/;
 const FROM_END_REG = /from\s*?["']/;
 
+const IMPORT_FROM_REG = /import.*?from\s*["']/;
+// const IMPORT_REG = /import\s*["']/;
+const IMPORT_PREFIX_LEN = "import ".length;
+
 /**
  * 
  * @param {import("eslint").Rule.RuleFixer} fixer 
@@ -10,7 +14,7 @@ const FROM_END_REG = /from\s*?["']/;
  * @param {Number} base 
  * @param {Number} suggested 
  */
-function fix(fixer, range, base, suggested) {
+function fixImportFrom(fixer, range, base, suggested) {
     // console.log("fix", range, base, suggested);
     if (range[1] - suggested > 0) {
         // need reducing space
@@ -25,12 +29,6 @@ function fix(fixer, range, base, suggested) {
 
 /** @type {import('eslint').Rule.RuleModule} */
 module.exports = {
-    docs: {
-        description: "enforce import statements \"from\" keyword align vertically",
-        category: "Stylistic Issues",
-        recommended: false,
-        url: "https://github.com/CGQAQ/eslint-rule-import-align"
-    },
     meta: {
         type: "layout",
         fixable: "whitespace",
@@ -39,6 +37,12 @@ module.exports = {
                 enum: ["always", "never"],
             },
         ],
+        docs: {
+            description: "enforce import statements \"from\" keyword align vertically",
+            category: "Stylistic Issues",
+            recommended: false,
+            url: "https://github.com/CGQAQ/eslint-rule-import-align"
+        },
     },
 
     create(ctx) {
@@ -50,23 +54,43 @@ module.exports = {
         /** @type {import("eslint").SourceCode} */
         const sourceCode = ctx.getSourceCode();
 
-        const imports = sourceCode.ast.body.filter(it => it.type === "ImportDeclaration");
-        const fromPosPair = imports.map(it => [FROM_REG.exec(sourceCode.getText(it)), FROM_END_REG.exec(sourceCode.getText(it)), it.start]);
+        const importFroms = sourceCode.ast.body.filter(it => it.type === "ImportDeclaration" && IMPORT_FROM_REG.test(sourceCode.getText(it)) && sourceCode.getText(it).split("\n").length === 1);
+        const fromPosPair = importFroms.map(it => [FROM_REG.exec(sourceCode.getText(it)), FROM_END_REG.exec(sourceCode.getText(it)), it.start]);
         const fromPosLeft = fromPosPair.map(it => it[0].index);
         const fromPosRight = fromPosPair.map(it => it[1].index);
+
+        const suggested = Math.max(...fromPosLeft) + 1;
         
         if (new Set(fromPosRight).size >= 1) {
             // need fix
-            const suggested = Math.max(...fromPosLeft) + 1;
-
-            for (let i = 0; i < imports.length; i++) {
+            for (let i = 0; i < importFroms.length; i++) {
                 if (fromPosRight[i] !== suggested) {
                     ctx.report({
-                        fix: (fixer) => fix(fixer, [fromPosLeft[i], fromPosRight[i]], fromPosPair[i][2], suggested),
+                        fix: (fixer) => fixImportFrom(fixer, [fromPosLeft[i], fromPosRight[i]], fromPosPair[i][2], suggested),
                         message: "Expected import statement \"from\" keyword to be aligned with any others.",
-                        node: imports[i],
+                        node: importFroms[i],
                     });
                 }
+            }
+        }
+
+        const imports = sourceCode.ast.body.filter(it => it.type === "ImportDeclaration" && !IMPORT_FROM_REG.test(sourceCode.getText(it)) && sourceCode.getText(it).split("\n").length === 1);
+        for (let i = 0; i < imports.length; i++) {
+            const importText = sourceCode.getText(imports[i]);
+            const quotesPos = /["']/.exec(importText).index;
+
+            if (quotesPos > IMPORT_PREFIX_LEN) {
+                ctx.report({
+                    fix: fixer => fixer.removeRange([imports[i].start + IMPORT_PREFIX_LEN, imports[i].start + quotesPos]),
+                    message: "Expected side effect import statement to be aligned with single space",
+                    node: imports[i],
+                });
+            } else if (quotesPos < IMPORT_PREFIX_LEN) {
+                ctx.report({
+                    fix: fixer => fixer.insertTextAfterRange([imports[i].start + IMPORT_PREFIX_LEN - 1, imports[i].start + IMPORT_PREFIX_LEN - 1], " "),
+                    message: "Expected side effect import statement to be aligned with single space",
+                    node: imports[i],
+                });
             }
         }
 
